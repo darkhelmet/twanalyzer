@@ -1,10 +1,12 @@
 package tweets
 
 import (
+    "bytes"
     "encoding/csv"
     "fmt"
     "io"
     "os"
+    "text/tabwriter"
     "time"
     "unicode/utf8"
 )
@@ -53,8 +55,16 @@ type Stats struct {
 }
 
 func (s *Stats) String() string {
-    format := "total: %d, golden: %d (%.2f%%), replies: %d (%.2f%%), retweets: %d (%.2f%%), total urls: %d, most urls in one tweet: %d"
-    return fmt.Sprintf(format, s.Total, s.Golden, s.percent(s.Golden), s.Replies, s.percent(s.Replies), s.Retweets, s.percent(s.Retweets), s.TotalUrls, s.MostUrls)
+    var buffer bytes.Buffer
+    w := tabwriter.NewWriter(&buffer, 0, 8, 0, '\t', 0)
+    fmt.Fprintf(w, "total:\t%d\n", s.Total)
+    fmt.Fprintf(w, "replies:\t%d (%.2f%%)\n", s.Replies, s.percent(s.Replies))
+    fmt.Fprintf(w, "retweets:\t%d (%.2f%%)\n", s.Retweets, s.percent(s.Retweets))
+    fmt.Fprintf(w, "golden:\t%d (%.2f%%)\n", s.Golden, s.percent(s.Golden))
+    fmt.Fprintf(w, "total urls:\t%d\n", s.TotalUrls)
+    fmt.Fprintf(w, "most urls:\t%d", s.MostUrls)
+    w.Flush()
+    return buffer.String()
 }
 
 func (s *Stats) percent(i int) float64 {

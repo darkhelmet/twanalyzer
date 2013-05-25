@@ -2,8 +2,8 @@ package main
 
 import (
     "flag"
+    "fmt"
     "github.com/darkhelmet/twanalyzer/tweets"
-    "log"
 )
 
 var (
@@ -12,10 +12,9 @@ var (
 
 func main() {
     flag.Parse()
-    log.Printf("loading from %s", *input)
     t, err := tweets.ParseTweets(*input)
     if err != nil {
-        log.Fatalf("parsing failed: %s", err)
+        panic(err)
     }
-    log.Println(t.Stats())
+    fmt.Println(t.Stats())
 }
